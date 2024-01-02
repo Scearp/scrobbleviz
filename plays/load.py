@@ -5,16 +5,14 @@ import matplotlib.dates as pdt
 from pyarrow import csv, json
 from datetime import datetime
 
+
 def load_lastfm_plays(file_name):
     options = csv.ReadOptions(column_names=["artist",
-                                        "album",
-                                        "track",
-                                        "date"])
+                                            "album",
+                                            "track",
+                                            "date"])
     table = csv.read_csv(file_name, read_options=options)
     df = table.to_pandas()
-
-    #df.date = [datetime.strptime(d, "%d %b %Y %H:%M").date()
-    #           for d in df.date]
 
     dates = []
     for d in df.date:
@@ -24,10 +22,11 @@ def load_lastfm_plays(file_name):
             dates.append(0)
 
     df.date = dates
-    
+
     df = df[df.date != 0]
 
     return df
+
 
 def load_spotify_plays(file_name):
     df = pd.read_json(file_name)
@@ -36,9 +35,8 @@ def load_spotify_plays(file_name):
     df.columns = ['date', 'artist', 'track', 'album']
 
     df['date'] = [datetime.strptime(d, "%Y-%m-%d %H:%M").date()
-               for d in df.date]
+                  for d in df.date]
 
     df['album'] = [np.nan] * len(df['album'])
-
 
     return df
